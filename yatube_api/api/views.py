@@ -1,8 +1,4 @@
-try:
-    from django_filters.rest_framework import DjangoFilterBackend
-except Exception:  # pragma: no cover - optional dependency
-    DjangoFilterBackend = None
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -14,19 +10,16 @@ from .serializers import (
     FollowSerializer,
 )
 from .permissions import IsAuthorOrReadOnly, IsAuthenticatedForFollow
+from .pagination import OptionalLimitOffsetPagination
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    filter_backends = []
-    if DjangoFilterBackend is not None:
-        filter_backends = [DjangoFilterBackend]
-
-    filterset_fields = []
-    if DjangoFilterBackend is not None:
-        filterset_fields = ['group']
+    pagination_class = OptionalLimitOffsetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['group']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
