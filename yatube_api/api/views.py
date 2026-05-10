@@ -8,7 +8,10 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from posts.models import Comment, Follow, Group, Post
 from .serializers import (
-    PostSerializer, CommentSerializer, GroupSerializer, FollowSerializer
+    PostSerializer,
+    CommentSerializer,
+    GroupSerializer,
+    FollowSerializer,
 )
 from .permissions import IsAuthorOrReadOnly, IsAuthenticatedForFollow
 
@@ -17,8 +20,13 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    filter_backends = [DjangoFilterBackend] if DjangoFilterBackend is not None else []
-    filterset_fields = ['group'] if DjangoFilterBackend is not None else []
+    filter_backends = []
+    if DjangoFilterBackend is not None:
+        filter_backends = [DjangoFilterBackend]
+
+    filterset_fields = []
+    if DjangoFilterBackend is not None:
+        filterset_fields = ['group']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

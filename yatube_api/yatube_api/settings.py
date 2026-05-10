@@ -101,8 +101,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 try:
-    # Prefer JWT auth when available
-    import rest_framework_simplejwt  # noqa: F401
+    # Prefer JWT auth when available. Use importlib to avoid unused-import
+    import importlib
+
+    importlib.import_module('rest_framework_simplejwt')
     default_auth = [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
