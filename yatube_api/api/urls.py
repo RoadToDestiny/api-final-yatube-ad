@@ -1,6 +1,5 @@
 from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
-
 # Import JWT views if available; otherwise omit JWT endpoints so the project
 # can run in environments where djangorestframework-simplejwt isn't installed.
 try:
@@ -56,5 +55,3 @@ if TokenObtainPairView is not None:
         ),
 
     ]
-
-
