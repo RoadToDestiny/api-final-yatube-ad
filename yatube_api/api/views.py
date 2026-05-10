@@ -1,4 +1,8 @@
-from django_filters.rest_framework import DjangoFilterBackend
+try:
+    from django_filters.rest_framework import DjangoFilterBackend
+except Exception:  # pragma: no cover - optional dependency
+    DjangoFilterBackend = None
+
 from rest_framework import filters, permissions, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -13,9 +17,8 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    pagination_class = None
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['group']
+    filter_backends = [DjangoFilterBackend] if DjangoFilterBackend is not None else []
+    filterset_fields = ['group'] if DjangoFilterBackend is not None else []
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

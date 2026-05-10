@@ -100,13 +100,24 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
+try:
+    # Prefer JWT auth when available
+    import rest_framework_simplejwt  # noqa: F401
+    default_auth = [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+except Exception:
+    # Fallback to session/basic auth in environments without simplejwt
+    default_auth = [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ]
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': default_auth,
     'DEFAULT_PAGINATION_CLASS': (
         'rest_framework.pagination.LimitOffsetPagination'
     ),

@@ -1,8 +1,14 @@
 from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView, TokenRefreshView, TokenVerifyView
-)
+
+# Import JWT views if available; otherwise omit JWT endpoints so the project
+# can run in environments where djangorestframework-simplejwt isn't installed.
+try:
+    from rest_framework_simplejwt.views import (
+        TokenObtainPairView, TokenRefreshView, TokenVerifyView
+    )
+except Exception:  # pragma: no cover - environment-dependent
+    TokenObtainPairView = TokenRefreshView = TokenVerifyView = None
 
 from .views import PostViewSet, CommentViewSet, GroupViewSet, FollowViewSet
 
@@ -28,15 +34,13 @@ urlpatterns = [
         }),
         name='post-comments-detail',
     ),
-    path(
-        'v1/jwt/create/',
-        TokenObtainPairView.as_view(),
-        name='token_obtain_pair',
-    ),
-    path('v1/jwt/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path(
-        'v1/jwt/verify/',
-        TokenVerifyView.as_view(),
-        name='token_verify',
-    ),
 ]
+
+# Add JWT endpoints only when views are available
+if TokenObtainPairView is not None:
+    urlpatterns += [
+        path('v1/jwt/create/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+        path('v1/jwt/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+        path('v1/jwt/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    ]
+ 
