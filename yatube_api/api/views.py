@@ -1,10 +1,8 @@
-from rest_framework import viewsets, permissions, filters
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, permissions, viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from posts.models import Post, Comment, Group, Follow
+from posts.models import Comment, Follow, Group, Post
 from .serializers import (
     PostSerializer, CommentSerializer, GroupSerializer, FollowSerializer
 )
@@ -47,7 +45,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedForFollow]
     filter_backends = [filters.SearchFilter]
     search_fields = ['following__username']
     pagination_class = None
@@ -57,4 +55,3 @@ class FollowViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
